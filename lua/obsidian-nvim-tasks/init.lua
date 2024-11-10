@@ -2,6 +2,7 @@
 
 local api = vim.api
 
+
 local function hello()
   api.nvim_out_write("Hello, Neovim!\n")
 end
