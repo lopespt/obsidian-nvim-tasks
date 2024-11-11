@@ -1,4 +1,3 @@
-require("obsidian-nvim-tasks.init")
 local installer = require("obsidian-nvim-tasks.installer")
 
 function R(module)
