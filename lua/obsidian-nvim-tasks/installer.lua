@@ -18,9 +18,7 @@ function M.Install()
     end,
     on_exit = function(j, return_val)
       vim.schedule(function()
-        if return_val == 0 then
-          logger.Info("Cli tool Installation successful")
-        else
+        if return_val ~= 0 then
           logger.Error("Cli tool installation failed")
         end
       end)
