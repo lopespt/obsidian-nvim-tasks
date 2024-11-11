@@ -18,14 +18,6 @@ var icons []string = []string{
 	icon_recurrence,
 }
 
-var icons_priority map[string]string = map[string]string{
-	icon_lowest_priority:  "lowest",
-	icon_low_priority:     "low",
-	icon_medium_priority:  "medium",
-	icon_high_priority:    "high",
-	icon_highest_priority: "highest",
-}
-
 var statuses map[string]string = map[string]string{
 	" ": "open",
 	"X": "closed",
@@ -37,7 +29,7 @@ var statuses map[string]string = map[string]string{
 }
 
 type Parser interface {
-	Parse(io.Reader, chan Task)
+	Parse(io.Reader, TaskContext, chan Task)
 }
 
 type ParserImpl struct {
@@ -69,11 +61,12 @@ func extractPriority(line *string) string {
 	return "normal"
 }
 
-func (p *ParserImpl) Parse(r io.Reader, out chan Task) {
+func (p *ParserImpl) Parse(r io.Reader, context TaskContext, out chan Task) {
 	scanner := bufio.NewScanner(r)
 	pattern := `^\s*-\s*\[(.)\]\s*(.*)$`
 	taskRegex := regexp.MustCompile(pattern)
 	//println(pattern)
+	lnum := 1
 	for scanner.Scan() {
 		line := scanner.Text()
 		matches := taskRegex.FindStringSubmatch(line)
@@ -88,6 +81,8 @@ func (p *ParserImpl) Parse(r io.Reader, out chan Task) {
 			scheduledDate := extractDate(icon_scheduled_date, &taskLine)
 			startDate := extractDate(icon_start_date, &taskLine)
 			priority := extractPriority(&taskLine)
+			thisLine := lnum
+			context.Lnum = &thisLine
 
 			task := Task{Description: taskLine,
 				Status:        status,
@@ -98,10 +93,11 @@ func (p *ParserImpl) Parse(r io.Reader, out chan Task) {
 				DueDate:       dueDate,
 				ScheduledDate: scheduledDate,
 				StartDate:     startDate,
+				Context:       context,
 			}
 
 			out <- task
 		}
-
+		lnum += 1
 	}
 }

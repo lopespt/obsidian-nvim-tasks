@@ -10,4 +10,8 @@ function M.get_package_path()
   return fn.fnamemodify(source, ":p:h:h:h")
 end
 
+function M.get_executable_cli()
+  return M.get_package_path() .. '/cli/obsidian-tasks.git'
+end
+
 return M
