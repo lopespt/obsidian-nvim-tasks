@@ -14,13 +14,20 @@ local function formatDate(icon, date)
   return icon .. outdt
 end
 
+local function formatStatus(status)
+  if status or " " == " " then
+    return " "
+  end
+  return "[" .. status .. "]"
+end
+
 local function createTaskFromLine(line)
   local task = vim.fn.json_decode(line)
   return {
     value = task,
     ordinal = task.description,
     display = formatDate("📅", task.dueDate or "") ..
-        formatDate("⏳", task.scheduledDate or "") .. "[" .. task.status .. "] " .. task.description,
+        formatDate("⏳", task.scheduledDate or "") .. formatStatus(task.status) .. task.description,
     filename = task.context.filename,
     lnum = task.context.lnum,
   }
@@ -30,9 +37,9 @@ M.AllObsidianTasks = function(opts)
   opts = opts or {}
   pickers.new(opts, {
     prompt_title = "Tasks",
-    finder = finders.new_oneshot_job({ utils.get_executable_cli(), "-v", "/Users/gwachs/obsidian/gwachs/" }, {
+    finder = finders.new_oneshot_job(
+    { utils.get_executable_cli(), "-v", "/Users/gwachs/obsidian/gwachs/", "--SortAnyDate" }, {
       entry_maker = function(line)
-        --convert json to table
         return createTaskFromLine(line)
       end
     }),
@@ -56,8 +63,5 @@ M.AllNotDoneTasks = function(opts)
 end
 
 -- to execute the function
-
-M.AllNotDoneTasks()
---M.AllObsidianTasks()
 
 return M
