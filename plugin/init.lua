@@ -1,3 +1,4 @@
 require("obsidian-nvim-tasks.init")
-require("obsidian-nvim-tasks.installer")
+local installer = require("obsidian-nvim-tasks.installer")
 
+print(installer.Install())
